@@ -1,0 +1,47 @@
+import * as React from "react";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import ProductCard from "./ProductCard";
+import { useEffect, useState } from "react";
+
+import instance from "../authContext";
+
+export default function Products() {
+  const [prods, SetProds] = useState([]);
+  const [loading, SetLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      SetLoading(true)
+      try {
+        const data = await instance.get("/api/products/list");
+        SetProds(data.data)
+      } catch (error) {
+        console.error(error);
+      }
+      SetLoading(false)
+    }
+    fetchData()
+  }, []);
+  console.log(prods.data);
+  return (
+    <>
+    {!loading && 
+      (<Box sx={{ flexGrow: 1, marginY: "1%", marginX: "auto", width: "80%" }}>
+        <Grid container spacing={{ xs: 2, md: 3, lg: 4 }}>
+          {prods.data.map((p) => (
+            <ProductCard
+              key={p._id}
+              name={p.name}
+              price={p.price}
+              img={'https://picsum.photos/seed/picsum/200/300'}
+              description={p.description}
+            />
+          ))}
+        </Grid>
+      </Box>)
+    }
+      
+    </>
+  );
+}
